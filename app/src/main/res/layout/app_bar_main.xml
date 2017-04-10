@@ -44,9 +44,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Click Me"/>
-        <include
-            layout="@layout/fragment_class_list"
-            />
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@id/tab_layout"/>
 
     </LinearLayout>
 
@@ -57,11 +60,5 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_dialog_email" />
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:layout_below="@id/tab_layout"/>
 
 </android.support.design.widget.CoordinatorLayout>
