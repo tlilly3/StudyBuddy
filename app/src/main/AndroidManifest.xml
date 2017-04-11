@@ -56,9 +56,13 @@
             android:name=".ClassJoinDetail"
             android:label="@string/title_activity_class_detail"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+        <activity
+            android:name=".HomeActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ClassHostActivity" />
+        <activity
+            android:name=".MapsActivity"
+            android:label="@string/title_activity_maps"></activity>
     </application>
 
 </manifest>

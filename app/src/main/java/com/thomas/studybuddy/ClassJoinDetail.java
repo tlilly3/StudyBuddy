@@ -25,14 +25,14 @@ public class ClassJoinDetail extends MainActivity {
 //                        .setAction("Action", null).show();
 //            }
 //        });
-//        joinButton = (Button) findViewById(R.id.join_button);
-//        joinButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mDatabase = FirebaseDatabase.getInstance().getReference();
-//                mDatabase.child("class").push().setValue("3");
-//            }
-//        });
+        joinButton = (Button) findViewById(R.id.join_button);
+        joinButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDatabase = FirebaseDatabase.getInstance().getReference();
+                mDatabase.child("class").push().setValue("3");
+            }
+        });
 
     }
 
