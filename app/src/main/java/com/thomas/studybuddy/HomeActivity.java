@@ -25,6 +25,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.thomas.studybuddy.dummy.DummyContent;
 
+import java.util.Iterator;
+
 public class HomeActivity extends MainActivity implements ClassFragment.OnListFragmentInteractionListener, OnMapReadyCallback {
 
     private TabLayout tabLayout;
@@ -48,39 +50,45 @@ public class HomeActivity extends MainActivity implements ClassFragment.OnListFr
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        ref.child("sessions").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                // Try to update the mapview
+//                Log.d("Firebase Callback", dataSnapshot.child("lat").toString());
+                LatLng latLng = new LatLng((Double)dataSnapshot.child("lat").getValue(), (Double)dataSnapshot.child("lng").getValue());
+                mMap.addMarker(new MarkerOptions().position(latLng).title("New Marker"));
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Log.d("Firebase", "Child was changed");
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Log.d("Firebase", "Child was removed successfully");
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                Log.d("Firebase", "I'm still not really sure what this does");
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("Firebase", "There was an error");
+            }
+        });
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                ref.child("sessions").addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        // Try to update the mapview
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(33.774918, -84.396453)).title("New Marker"));
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                        Log.d("Firebase", "Child was changed");
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-                        Log.d("Firebase", "Child was removed successfully");
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                        Log.d("Firebase", "I'm still not really sure what this does");
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.e("Firebase", "There was an error");
-                    }
-                });
+                String key = ref.child("sessions").push().getKey();
+                ref.child("sessions").child(key).child("lat").setValue(33.774918);
+                ref.child("sessions").child(key).child("lng").setValue(-84.396453);
             }
         });
+
     }
     @Override
     public void onMapReady(GoogleMap googleMap) {

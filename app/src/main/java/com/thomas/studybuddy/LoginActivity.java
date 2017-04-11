@@ -152,7 +152,7 @@ public class LoginActivity extends AppCompatActivity {
 //                        });
             }
         });
-        homeScreenIntent = new Intent(this, ClassJoinDetail.class);
+        homeScreenIntent = new Intent(this, HomeActivity.class);
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
