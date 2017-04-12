@@ -97,6 +97,7 @@ public class HomeActivity extends MainActivity implements ClassFragment.OnListFr
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(33.774259, -84.398170);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Campanile"));
+        mMap.moveCamera(CameraUpdateFactory.zoomTo(16 ));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 

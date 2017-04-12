@@ -60,9 +60,8 @@
             android:name=".HomeActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ClassHostActivity" />
-        <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"></activity>
+        <activity android:name=".TutorListing" />
+        <activity android:name=".OffersActivity"></activity>
     </application>
 
 </manifest>
