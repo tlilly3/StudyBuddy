@@ -1,10 +1,15 @@
 package com.thomas.studybuddy;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.google.firebase.database.IgnoreExtraProperties;
+
 /**
  * Created by thomas on 4/15/17.
  */
-
-public class ClassModel {
+@IgnoreExtraProperties
+public class ClassModel implements Parcelable {
     private String course;
     private String type;
     private Double numPeople;
@@ -26,6 +31,18 @@ public class ClassModel {
         this.description = description;
         this.numPeople = numPeople;
         this. capacity = capacity;
+    }
+
+    public ClassModel (Parcel input) {
+        course = input.readString();
+        type = input.readString();
+        numPeople = input.readDouble();
+        capacity = input.readDouble();
+        building = input.readString();
+        roomNumber = input.readDouble();
+        description = input.readString();
+        lat = input.readDouble();
+        lng = input.readDouble();
     }
 
 
@@ -103,9 +120,38 @@ public class ClassModel {
         this.lng = lng;
     }
     public String getLocationView() {
-        return building + " " + roomNumber;
+        return building + " " + (int)roomNumber.doubleValue();
     }
     public String getCapcityView() {
-        return numPeople + "/" + capacity;
+        return (int)numPeople.doubleValue() + "/" + (int)capacity.doubleValue();
     }
+
+    @Override
+    public int describeContents() {
+        return 9;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(course);
+        dest.writeString(type);
+        dest.writeDouble(numPeople);
+        dest.writeDouble(capacity);
+        dest.writeString(building);
+        dest.writeDouble(roomNumber);
+        dest.writeString(description);
+        dest.writeDouble(lat);
+        dest.writeDouble(lng);
+    }
+    public static final Creator CREATOR = new Creator() {
+        @Override
+        public Object createFromParcel(Parcel source) {
+            return new ClassModel(source);
+        }
+
+        @Override
+        public ClassModel[] newArray(int size) {
+            return new ClassModel[size];
+        }
+    };
 }

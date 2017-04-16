@@ -3,18 +3,26 @@ package com.thomas.studybuddy;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.*;
+import android.support.v7.widget.DividerItemDecoration;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.thomas.studybuddy.dummy.DummyContent;
 import com.thomas.studybuddy.dummy.DummyContent.DummyItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * A fragment representing a list of Items.
@@ -29,6 +37,7 @@ public class ClassFragment extends Fragment {
     // TODO: Customize parameters
     private int sessionType;
     private List<ClassModel> contents;
+    private MyClassRecyclerViewAdapter myClassRecyclerViewAdapter;
     private OnListFragmentInteractionListener mListener;
 
     /**
@@ -54,7 +63,42 @@ public class ClassFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        ref.child("sessions").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                // Try to update the mapview
+//                Log.d("Firebase Callback", dataSnapshot.child("lat").toString());
+                String type = (String) dataSnapshot.child("type").getValue();
+                if (sessionType == 0 && type.equals("H")) {
+                    ClassModel cm = dataSnapshot.getValue(ClassModel.class);
+                    contents.add(cm);
+                    myClassRecyclerViewAdapter.notifyItemInserted(contents.size()-1);
+                }
+//                LatLng latLng = new LatLng((Double)dataSnapshot.child("lat").getValue(), (Double)dataSnapshot.child("lng").getValue());
+//                mMap.addMarker(new MarkerOptions().position(latLng).title("New Marker"));
+            }
 
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Log.d("Firebase", "Child was changed");
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Log.d("Firebase", "Child was removed successfully");
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                Log.d("Firebase", "I'm still not really sure what this does");
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("Firebase", "There was an error");
+            }
+        });
         if (getArguments() != null) {
             sessionType = getArguments().getInt(ARG_SESSION_TYPE);
         }
@@ -77,7 +121,9 @@ public class ClassFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new MyClassRecyclerViewAdapter(contents, mListener));
+            myClassRecyclerViewAdapter = new MyClassRecyclerViewAdapter(contents, mListener);
+            recyclerView.setAdapter(myClassRecyclerViewAdapter);
+            recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
         }
         return view;
     }

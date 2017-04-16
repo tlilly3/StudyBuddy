@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:id="@+id/linearLayout">
         <TextView
             android:id="@+id/class_name"
             android:layout_width="wrap_content"
@@ -22,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="1dp"
             android:text="Clough Undergraduate Commons 124"
-            android:textSize="10sp"
+            android:textSize="12sp"
             android:textColor="#757575"/>
         <TextView
             android:id="@+id/topic"
@@ -30,12 +33,10 @@
             android:layout_height="wrap_content"
             android:layout_margin="1dp"
             android:text="Topic: Parallel Prefix programming assignment"
-            android:textSize="10sp"
+            android:textSize="12sp"
             android:textColor="#757575"/>
     </LinearLayout>
-    <android.support.v4.widget.Space
-        android:layout_width="120dp"
-        android:layout_height="wrap_content" />
+
     <TextView
         android:id="@+id/capacity"
         android:layout_width="wrap_content"
@@ -43,5 +44,10 @@
         android:layout_margin="1dp"
         android:text="10/45"
         android:textSize="10sp"
-        android:textColor="#757575"/>
-</LinearLayout>
+        android:textColor="#757575"
+        android:layout_gravity="right"
+        app:layout_constraintBottom_toBottomOf="@+id/linearLayout"
+        android:layout_marginBottom="0dp"
+        android:layout_marginRight="15dp"
+        app:layout_constraintRight_toRightOf="parent" />
+</android.support.constraint.ConstraintLayout>

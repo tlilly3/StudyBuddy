@@ -40,6 +40,7 @@ public class HomeActivity extends MainActivity implements ClassFragment.OnListFr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setUp();
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Studys"));
         tabLayout.addTab(tabLayout.newTab().setText("Homeworks"));
@@ -50,47 +51,20 @@ public class HomeActivity extends MainActivity implements ClassFragment.OnListFr
         mViewPager.setAdapter(classPager);
         BottomSheetUtils.setupViewPager(mViewPager);
         Button b = (Button) findViewById(R.id.test_button);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-        ref.child("sessions").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                // Try to update the mapview
-//                Log.d("Firebase Callback", dataSnapshot.child("lat").toString());
-                LatLng latLng = new LatLng((Double)dataSnapshot.child("lat").getValue(), (Double)dataSnapshot.child("lng").getValue());
-                mMap.addMarker(new MarkerOptions().position(latLng).title("New Marker"));
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Log.d("Firebase", "Child was changed");
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Log.d("Firebase", "Child was removed successfully");
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                Log.d("Firebase", "I'm still not really sure what this does");
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("Firebase", "There was an error");
-            }
-        });
+        final ClassModel cm = new ClassModel("CS 4001", "Howey", (double)101, "Assignment 12 more physics ", (double)10, (double)45);
+        cm.setLat(33.775179);
+        cm.setLng(-84.396361);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String key = ref.child("sessions").push().getKey();
-                ref.child("sessions").child(key).child("lat").setValue(33.774918);
-                ref.child("sessions").child(key).child("lng").setValue(-84.396453);
+                ref.child("sessions").push().setValue(cm);
             }
         });
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+
 
     }
     @Override
