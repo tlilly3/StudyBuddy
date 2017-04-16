@@ -3,18 +3,45 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
-
-    <TextView
-        android:id="@+id/id"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem" />
-
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/class_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            android:text="CS 4002"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="#212121"/>
+        <TextView
+            android:id="@+id/location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            android:text="Clough Undergraduate Commons 124"
+            android:textSize="10sp"
+            android:textColor="#757575"/>
+        <TextView
+            android:id="@+id/topic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            android:text="Topic: Parallel Prefix programming assignment"
+            android:textSize="10sp"
+            android:textColor="#757575"/>
+    </LinearLayout>
+    <android.support.v4.widget.Space
+        android:layout_width="120dp"
+        android:layout_height="wrap_content" />
     <TextView
-        android:id="@+id/content"
+        android:id="@+id/capacity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem" />
+        android:layout_margin="1dp"
+        android:text="10/45"
+        android:textSize="10sp"
+        android:textColor="#757575"/>
 </LinearLayout>

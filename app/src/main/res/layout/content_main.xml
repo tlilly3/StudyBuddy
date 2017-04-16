@@ -16,8 +16,8 @@
         map:layout_constraintTop_toTopOf="parent"
         map:layout_constraintLeft_toLeftOf="parent"
         map:layout_constraintRight_toRightOf="parent"
-        android:layout_width="0dp"
-        android:layout_height="495dp"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
         tools:context="com.thomas.studybuddy.HomeActivity" />
 
 </android.support.constraint.ConstraintLayout>

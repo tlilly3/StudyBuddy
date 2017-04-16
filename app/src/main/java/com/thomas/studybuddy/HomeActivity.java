@@ -27,6 +27,8 @@ import com.thomas.studybuddy.dummy.DummyContent;
 
 import java.util.Iterator;
 
+import biz.laenger.android.vpbs.BottomSheetUtils;
+
 public class HomeActivity extends MainActivity implements ClassFragment.OnListFragmentInteractionListener, OnMapReadyCallback {
 
     private TabLayout tabLayout;
@@ -46,6 +48,7 @@ public class HomeActivity extends MainActivity implements ClassFragment.OnListFr
                         getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(classPager);
+        BottomSheetUtils.setupViewPager(mViewPager);
         Button b = (Button) findViewById(R.id.test_button);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -102,7 +105,7 @@ public class HomeActivity extends MainActivity implements ClassFragment.OnListFr
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+    public void onListFragmentInteraction(ClassModel item) {
         Log.d("MAIN", "Interacted with The fragment");
     }
 
@@ -120,7 +123,7 @@ public class HomeActivity extends MainActivity implements ClassFragment.OnListFr
 
         @Override
         public int getCount() {
-            return 100;
+            return 2;
         }
 
         @Override

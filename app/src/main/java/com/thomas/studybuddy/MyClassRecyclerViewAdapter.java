@@ -18,10 +18,10 @@ import java.util.List;
  */
 public class MyClassRecyclerViewAdapter extends RecyclerView.Adapter<MyClassRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private final List<ClassModel> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyClassRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
+    public MyClassRecyclerViewAdapter(List<ClassModel> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -36,9 +36,9 @@ public class MyClassRecyclerViewAdapter extends RecyclerView.Adapter<MyClassRecy
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
-
+        holder.mLocationView.setText(holder.mItem.getLocationView());
+        holder.mTopicView.setText(holder.mItem.getDescription());
+        holder.mCapacityView.setText(holder.mItem.getCapcityView());
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,20 +58,24 @@ public class MyClassRecyclerViewAdapter extends RecyclerView.Adapter<MyClassRecy
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
+        public final TextView mCourseView;
+        public final TextView mLocationView;
+        public final TextView mTopicView;
+        public final TextView mCapacityView;
+        public ClassModel mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.id);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            mCourseView = (TextView) view.findViewById(R.id.class_name);
+            mLocationView = (TextView) view.findViewById(R.id.location);
+            mTopicView = (TextView) view.findViewById(R.id.topic);
+            mCapacityView = (TextView) view.findViewById(R.id.capacity);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + mTopicView.getText() + "'";
         }
     }
 }

@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.thomas.studybuddy.dummy.DummyContent;
 import com.thomas.studybuddy.dummy.DummyContent.DummyItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,9 +25,10 @@ import java.util.List;
 public class ClassFragment extends Fragment {
 
     // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String ARG_SESSION_TYPE = "session-type";
     // TODO: Customize parameters
-    private int mColumnCount = 1;
+    private int sessionType;
+    private List<ClassModel> contents;
     private OnListFragmentInteractionListener mListener;
 
     /**
@@ -39,11 +41,14 @@ public class ClassFragment extends Fragment {
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static ClassFragment newInstance(int columnCount) {
-        ClassFragment fragment = new ClassFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
+        if (columnCount == 0 || columnCount == 1) {
+            ClassFragment fragment = new ClassFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SESSION_TYPE, columnCount);
+            fragment.setArguments(args);
+            return fragment;
+        }
+        return null;
     }
 
     @Override
@@ -51,7 +56,14 @@ public class ClassFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            sessionType = getArguments().getInt(ARG_SESSION_TYPE);
+        }
+        if (sessionType == 0) {
+            // Load Studys
+            contents = new ArrayList<>();
+        } else if (sessionType == 1) {
+            // Load Homework Sessionsc
+            contents = new ArrayList<>();
         }
     }
 
@@ -64,12 +76,8 @@ public class ClassFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            recyclerView.setAdapter(new MyClassRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            recyclerView.setAdapter(new MyClassRecyclerViewAdapter(contents, mListener));
         }
         return view;
     }
@@ -104,6 +112,6 @@ public class ClassFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(ClassModel item);
     }
 }
