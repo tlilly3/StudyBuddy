@@ -1,5 +1,6 @@
 package com.thomas.studybuddy;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,6 +19,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,6 +28,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.thomas.studybuddy.dummy.DummyContent;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import biz.laenger.android.vpbs.BottomSheetUtils;
@@ -54,10 +59,15 @@ public class HomeActivity extends MainActivity implements ClassFragment.OnListFr
         final ClassModel cm = new ClassModel("CS 4001", "Howey", (double)101, "Assignment 12 more physics ", (double)10, (double)45);
         cm.setLat(33.775179);
         cm.setLng(-84.396361);
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        cm.setType("H");
+        cm.setHostUID(user.getUid());
+        cm.setHost(user.getDisplayName());
+        cm.setParticipants(new ArrayList<String>(Arrays.asList("Nicolette Prevost", "Pratik Kunapali", "Hannah Lee")));
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ref.child("sessions").push().setValue(cm);
+                ref.child("sessions").child(user.getUid()).setValue(cm);
             }
         });
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -81,6 +91,9 @@ public class HomeActivity extends MainActivity implements ClassFragment.OnListFr
     @Override
     public void onListFragmentInteraction(ClassModel item) {
         Log.d("MAIN", "Interacted with The fragment");
+        Intent classDetail = new Intent(this, ClassJoinDetail.class);
+        classDetail.putExtra("class", item);
+        startActivity(classDetail);
     }
 
     // Since this is an object collection, use a FragmentStatePagerAdapter,

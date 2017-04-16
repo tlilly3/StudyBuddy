@@ -5,6 +5,9 @@ import android.os.Parcelable;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by thomas on 4/15/17.
  */
@@ -19,6 +22,9 @@ public class ClassModel implements Parcelable {
     private String description;
     private Double lat;
     private Double lng;
+    private String hostUID;
+    private String host;
+    private List<String> participants;
 
     public ClassModel() {
 
@@ -43,6 +49,10 @@ public class ClassModel implements Parcelable {
         description = input.readString();
         lat = input.readDouble();
         lng = input.readDouble();
+        hostUID = input.readString();
+        host = input.readString();
+        participants = new ArrayList<>();
+        input.readStringList(participants);
     }
 
 
@@ -142,6 +152,9 @@ public class ClassModel implements Parcelable {
         dest.writeString(description);
         dest.writeDouble(lat);
         dest.writeDouble(lng);
+        dest.writeString(hostUID);
+        dest.writeString(host);
+        dest.writeStringList(participants);
     }
     public static final Creator CREATOR = new Creator() {
         @Override
@@ -154,4 +167,28 @@ public class ClassModel implements Parcelable {
             return new ClassModel[size];
         }
     };
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public List<String> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<String> participants) {
+        this.participants = participants;
+    }
+
+    public String getHostUID() {
+        return hostUID;
+    }
+
+    public void setHostUID(String hostUID) {
+        this.hostUID = hostUID;
+    }
 }
