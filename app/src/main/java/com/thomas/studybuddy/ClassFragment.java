@@ -74,6 +74,10 @@ public class ClassFragment extends Fragment {
                     ClassModel cm = dataSnapshot.getValue(ClassModel.class);
                     contents.add(cm);
                     myClassRecyclerViewAdapter.notifyItemInserted(contents.size()-1);
+                } else if (sessionType == 1 && type.equals("S")) {
+                    ClassModel cm = dataSnapshot.getValue(ClassModel.class);
+                    contents.add(cm);
+                    myClassRecyclerViewAdapter.notifyItemInserted(contents.size()-1);
                 }
 //                LatLng latLng = new LatLng((Double)dataSnapshot.child("lat").getValue(), (Double)dataSnapshot.child("lng").getValue());
 //                mMap.addMarker(new MarkerOptions().position(latLng).title("New Marker"));

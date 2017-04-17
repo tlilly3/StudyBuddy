@@ -1,19 +1,31 @@
 package com.thomas.studybuddy;
 
+import android.*;
+import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
@@ -30,9 +42,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 
-public class ClassHostActivity extends MainActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class ClassHostActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private Button hostButton;
     private DatabaseReference mDatabase;
     private RadioGroup group;
@@ -47,6 +62,7 @@ public class ClassHostActivity extends MainActivity implements GoogleApiClient.C
     private Double lat;
     private Double lng;
     private boolean hasChild;
+    private final int request = 1;
 
 
 
@@ -54,7 +70,6 @@ public class ClassHostActivity extends MainActivity implements GoogleApiClient.C
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_class_host);
-        setUp();
         building = (EditText) findViewById(R.id.building);
         roomNumber = (EditText) findViewById(R.id.room_number);
         description = (EditText) findViewById(R.id.description);
@@ -62,6 +77,13 @@ public class ClassHostActivity extends MainActivity implements GoogleApiClient.C
         hostButton = (Button) findViewById(R.id.host_button);
         group = (RadioGroup) findViewById(R.id.radio_group);
         spinner = (Spinner) findViewById(R.id.class_name);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Host Session");
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, Arrays.asList("CS 4001", "CS 4002", "CS 4003"));
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(arrayAdapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -95,7 +117,7 @@ public class ClassHostActivity extends MainActivity implements GoogleApiClient.C
                     }
                 });
                 if (hasChild) {
-                    Snackbar.make(findViewById(R.id.host_layout), "Please End Current Session to start new one", Snackbar.LENGTH_SHORT);
+                    Snackbar.make(findViewById(R.id.host_layout), "Please End Current Session to start new one", Snackbar.LENGTH_SHORT).show();
                 } else if (validate()) {
                     String buildingName = building.getText().toString();
                     String room = roomNumber.getText().toString();
@@ -110,13 +132,40 @@ public class ClassHostActivity extends MainActivity implements GoogleApiClient.C
                         cm.setType("H");
                     }
                     cm.setHostUID(user.getUid());
-                    cm.setHost(user.getDisplayName());
+                    // Todo add real display name
+                    cm.setHost("Thomas Lilly");
                     ref.child(user.getUid()).setValue(cm);
+                    Intent intent = new Intent(ClassHostActivity.this, HomeActivity.class);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(ClassHostActivity.this, 01, intent, PendingIntent.FLAG_ONE_SHOT);
+                    Uri defaultSoundUri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    Notification.Builder builder = new Notification.Builder(getApplicationContext());
+                    builder.setContentTitle("Tap to cancel live session");
+                    builder.setContentIntent(pendingIntent);
+                    builder.setSmallIcon(R.drawable.ic_class_black_24dp);
+                    builder.setOngoing(true);
+                    builder.setAutoCancel(true);
+                    builder.setPriority(Notification.PRIORITY_HIGH);
+                    builder.setSound(defaultSoundUri);
+                    Notification notification = builder.build();
+                    NotificationManager notificationManger =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManger.notify(01, notification);
 
                 }
             }
         });
 
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // app icon in action bar clicked; goto parent activity.
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -129,16 +178,6 @@ public class ClassHostActivity extends MainActivity implements GoogleApiClient.C
     protected void onStop() {
         googleApiClient.disconnect();
         super.onStop();
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        super.onCreateOptionsMenu(menu);
-        MenuItem menuItem = menu.findItem(R.id.add_session);
-        menuItem.setVisible(false);
-        return true;
     }
 
     private boolean validate() {
@@ -175,7 +214,7 @@ public class ClassHostActivity extends MainActivity implements GoogleApiClient.C
             cancel = false;
         } else if (group.getCheckedRadioButtonId() == -1) {
             cancel = false;
-            Snackbar.make(findViewById(R.id.host_layout), "You must select a radio button", Snackbar.LENGTH_SHORT);
+            Snackbar.make(findViewById(R.id.host_layout), "You must select a radio button", Snackbar.LENGTH_SHORT).show();
         }
         try {
             Integer.parseInt(cap);
@@ -203,7 +242,11 @@ public class ClassHostActivity extends MainActivity implements GoogleApiClient.C
                 != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
+            // TODO: Consider callin
+            Log.d("Permissions", "Requesting Permissions");
+            ActivityCompat.requestPermissions(ClassHostActivity.this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                    request);
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
@@ -217,6 +260,39 @@ public class ClassHostActivity extends MainActivity implements GoogleApiClient.C
         if (mLastLocation != null) {
             lat = mLastLocation.getLatitude();
             lng = mLastLocation.getLongitude();
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) throws SecurityException {
+        switch (requestCode) {
+            case request: {
+                // If request is cancelled, the result arrays are empty.
+
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("Permissions", "Permissions granted");
+                    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                            googleApiClient);
+                    if (mLastLocation != null) {
+                        lat = mLastLocation.getLatitude();
+                        lng = mLastLocation.getLongitude();
+                    }
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
         }
     }
 
