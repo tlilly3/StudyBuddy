@@ -6,39 +6,34 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.thomas.studybuddy.ClassFragment.OnListFragmentInteractionListener;
-import com.thomas.studybuddy.dummy.DummyContent.DummyItem;
-
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
+ * Created by thomas on 4/17/17.
  */
-public class MyListingRecyclerViewAdapter extends RecyclerView.Adapter<MyListingRecyclerViewAdapter.ViewHolder> {
 
+public class MyOfferRecyclerViewAdapter extends RecyclerView.Adapter<MyOfferRecyclerViewAdapter.ViewHolder> {
     private final List<ClassModel> mValues;
-    private final OnListFragmentInteractionListener mListener;
+    private final OfferFragment.OnListFragmentInteractionListener mListener;
 
-    public MyListingRecyclerViewAdapter(List<ClassModel> items, OnListFragmentInteractionListener listener) {
+    public MyOfferRecyclerViewAdapter(List<ClassModel> items, OfferFragment.OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyOfferRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_listing, parent, false);
-        return new ViewHolder(view);
+        return new MyOfferRecyclerViewAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final MyOfferRecyclerViewAdapter.ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mLocationView.setText(holder.mItem.getLocationView());
         holder.mTopicView.setText(holder.mItem.getDescription());
-        holder.mCapacityView.setText(holder.mItem.getMoneyView());
+        holder.mCapacityView.setText(holder.mItem.getCostView());
         holder.mDateView.setText(holder.mItem.getDate());
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,6 +70,10 @@ public class MyListingRecyclerViewAdapter extends RecyclerView.Adapter<MyListing
             mCapacityView = (TextView) view.findViewById(R.id.capacity);
             mDateView = (TextView) view.findViewById(R.id.date);
 
+        }
+
+        public ClassModel getmItem() {
+            return mItem;
         }
 
         @Override

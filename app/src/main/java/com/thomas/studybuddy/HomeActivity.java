@@ -56,20 +56,20 @@ public class HomeActivity extends MainActivity implements ClassFragment.OnListFr
         mViewPager.setAdapter(classPager);
         BottomSheetUtils.setupViewPager(mViewPager);
         Button b = (Button) findViewById(R.id.test_button);
-        final ClassModel cm = new ClassModel("CS 4001", "Howey", (double)101, "Assignment 12 more physics ", (double)10, (double)45);
-        cm.setLat(33.775179);
-        cm.setLng(-84.396361);
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        cm.setType("H");
-        cm.setHostUID(user.getUid());
-        cm.setHost(user.getDisplayName());
-        cm.setParticipants(new ArrayList<String>(Arrays.asList("Nicolette Prevost", "Pratik Kunapali", "Hannah Lee")));
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ref.child("sessions").child(user.getUid()).setValue(cm);
-            }
-        });
+//        final ClassModel cm = new ClassModel("CS 4001", "Howey", 101, "Assignment 12 more physics ", (double)10, (double)45);
+//        cm.setLat(33.775179);
+//        cm.setLng(-84.396361);
+//        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//        cm.setType("H");
+//        cm.setHostUID(user.getUid());
+//        cm.setHost(user.getDisplayName());
+//        cm.setParticipants(new ArrayList<String>(Arrays.asList("Nicolette Prevost", "Pratik Kunapali", "Hannah Lee")));
+//        b.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                ref.child("sessions").child(user.getUid()).setValue(cm);
+//            }
+//        });
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);

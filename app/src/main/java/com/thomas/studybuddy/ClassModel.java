@@ -15,22 +15,26 @@ import java.util.List;
 public class ClassModel implements Parcelable {
     private String course;
     private String type;
-    private Double numPeople;
-    private Double capacity;
+    private Long numPeople;
+    private Long capacity;
     private String building;
-    private Double roomNumber;
+    private Long roomNumber;
     private String description;
     private Double lat;
     private Double lng;
     private String hostUID;
     private String host;
     private List<String> participants;
+    private String date;
+    private Long cost;
+    private String key;
+    private Long offer;
 
     public ClassModel() {
 
     }
 
-    public ClassModel(String course, String building, Double roomNumber, String description, Double numPeople, Double capacity) {
+    public ClassModel(String course, String building, Long roomNumber, String description, Long numPeople, Long capacity) {
         this.course = course;
         this.building = building;
         this.roomNumber = roomNumber;
@@ -42,10 +46,10 @@ public class ClassModel implements Parcelable {
     public ClassModel (Parcel input) {
         course = input.readString();
         type = input.readString();
-        numPeople = input.readDouble();
-        capacity = input.readDouble();
+        numPeople = input.readLong();
+        capacity = input.readLong();
         building = input.readString();
-        roomNumber = input.readDouble();
+        roomNumber = input.readLong();
         description = input.readString();
         lat = input.readDouble();
         lng = input.readDouble();
@@ -53,6 +57,9 @@ public class ClassModel implements Parcelable {
         host = input.readString();
         participants = new ArrayList<>();
         input.readStringList(participants);
+        date = input.readString();
+        cost = input.readLong();
+        key = input.readString();
     }
 
 
@@ -80,6 +87,30 @@ public class ClassModel implements Parcelable {
         this.building = building;
     }
 
+    public Long getNumPeople() {
+        return numPeople;
+    }
+
+    public void setNumPeople(Long numPeople) {
+        this.numPeople = numPeople;
+    }
+
+    public Long getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Long capacity) {
+        this.capacity = capacity;
+    }
+
+    public Long getRoomNumber() {
+        return roomNumber;
+    }
+
+    public void setRoomNumber(Long roomNumber) {
+        this.roomNumber = roomNumber;
+    }
+
 
 
     public String getDescription() {
@@ -90,29 +121,6 @@ public class ClassModel implements Parcelable {
         this.description = description;
     }
 
-    public Double getNumPeople() {
-        return numPeople;
-    }
-
-    public void setNumPeople(Double numPeople) {
-        this.numPeople = numPeople;
-    }
-
-    public Double getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(Double capacity) {
-        this.capacity = capacity;
-    }
-
-    public Double getRoomNumber() {
-        return roomNumber;
-    }
-
-    public void setRoomNumber(Double roomNumber) {
-        this.roomNumber = roomNumber;
-    }
 
     public Double getLat() {
         return lat;
@@ -130,10 +138,10 @@ public class ClassModel implements Parcelable {
         this.lng = lng;
     }
     public String getLocationView() {
-        return building + " " + (int)roomNumber.doubleValue();
+        return building + " " + roomNumber;
     }
     public String getCapcityView() {
-        return (int)numPeople.doubleValue() + "/" + (int)capacity.doubleValue();
+        return numPeople + "/" + capacity;
     }
 
     @Override
@@ -145,16 +153,19 @@ public class ClassModel implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(course);
         dest.writeString(type);
-        dest.writeDouble(numPeople);
-        dest.writeDouble(capacity);
+        dest.writeLong(numPeople);
+        dest.writeLong(capacity);
         dest.writeString(building);
-        dest.writeDouble(roomNumber);
+        dest.writeLong(roomNumber);
         dest.writeString(description);
         dest.writeDouble(lat);
         dest.writeDouble(lng);
         dest.writeString(hostUID);
         dest.writeString(host);
         dest.writeStringList(participants);
+        dest.writeString(date);
+        dest.writeLong(cost);
+        dest.writeString(key);
     }
     public static final Creator CREATOR = new Creator() {
         @Override
@@ -191,4 +202,49 @@ public class ClassModel implements Parcelable {
     public void setHostUID(String hostUID) {
         this.hostUID = hostUID;
     }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getMoneyView() {
+        long reduced = (cost / 10) + 1;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < reduced; i++) {
+            sb.append("$");
+        }
+        return sb.toString();
+    }
+    public String getCostView() {
+        if (offer == null) {
+            return "$-";
+        }
+        return "$" + (int)offer.doubleValue();
+    }
+
+    public void setCost(Long cost) {
+        this.cost = cost;
+    }
+
+    public Long getCost() {
+        return cost;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public void setOffer(Long offer) {
+        this.offer = offer;
+    }
+
+
 }

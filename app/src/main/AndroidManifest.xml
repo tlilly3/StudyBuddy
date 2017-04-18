@@ -62,8 +62,10 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ClassHostActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".TutorListing" />
-        <activity android:name=".OffersActivity"></activity>
+        <activity android:name=".TutorListing"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".OffersActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

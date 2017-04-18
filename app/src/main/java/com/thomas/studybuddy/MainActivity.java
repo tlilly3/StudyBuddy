@@ -99,18 +99,17 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.home) {
-            Intent homeIntent = new Intent(this, HomeActivity.class);
-            startActivity(homeIntent);
+            Intent intent = new Intent(this, HomeActivity.class);
+            startActivity(intent);
             finish();
         } else if (id == R.id.tutoring) {
-            Intent homeIntent = new Intent(this, HomeActivity.class);
-            startActivity(homeIntent);
+            Intent intent = new Intent(this, TutorListing.class);
+            startActivity(intent);
         } else if (id == R.id.offers) {
-            Intent homeIntent = new Intent(this, HomeActivity.class);
-            startActivity(homeIntent);
+            Intent intent = new Intent(this, OffersActivity.class);
+            startActivity(intent);
         } else if (id == R.id.settings) {
-            Intent homeIntent = new Intent(this, HomeActivity.class);
-            startActivity(homeIntent);
+            // Implement settings activity in the future
         } else if (id == R.id.logout) {
             FirebaseAuth.getInstance().signOut();
             Intent homeIntent = new Intent(this, LoginActivity.class);

@@ -1,57 +1,58 @@
 package com.thomas.studybuddy;
 
+
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.*;
 import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.thomas.studybuddy.dummy.DummyContent;
-import com.thomas.studybuddy.dummy.DummyContent.DummyItem;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
+ * Created by thomas on 4/17/17.
  */
-public class ClassFragment extends Fragment {
 
+public class OfferFragment extends Fragment {
     // TODO: Customize parameter argument names
     private static final String ARG_SESSION_TYPE = "session-type";
     // TODO: Customize parameters
     private int sessionType;
     private List<ClassModel> contents;
-    private MyClassRecyclerViewAdapter myClassRecyclerViewAdapter;
+    private MyOfferRecyclerViewAdapter myOfferRecyclerViewAdapter;
     private OnListFragmentInteractionListener mListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ClassFragment() {
+    public OfferFragment() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static ClassFragment newInstance(int columnCount) {
+    public static OfferFragment newInstance(int columnCount) {
         if (columnCount == 0 || columnCount == 1) {
-            ClassFragment fragment = new ClassFragment();
+            OfferFragment fragment = new OfferFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SESSION_TYPE, columnCount);
             fragment.setArguments(args);
@@ -64,21 +65,28 @@ public class ClassFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-        ref.child("sessions").addChildEventListener(new ChildEventListener() {
+        ref.child("tutor_list").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 // Try to update the mapview
 //                Log.d("Firebase Callback", dataSnapshot.child("lat").toString());
-                String type = (String) dataSnapshot.child("type").getValue();
+
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 Log.d("FirebaseCallback", String.format("Adding session of type %d", sessionType));
-                if (sessionType == 0 && type.equals("S")) {
-                    ClassModel cm = dataSnapshot.getValue(ClassModel.class);
+                if (sessionType == 0 && dataSnapshot.child("info").child("hostUID").getValue().equals(user.getUid())
+                                    && dataSnapshot.hasChild("offers")) {
+                    for (DataSnapshot snapshot : dataSnapshot.child("offers").getChildren()) {
+                        ClassModel cm = dataSnapshot.child("info").getValue(ClassModel.class);
+                        cm.setOffer((Long)snapshot.getValue());
+                        contents.add(cm);
+                        myOfferRecyclerViewAdapter.notifyItemInserted(contents.size()-1);
+                    }
+                } else if (sessionType == 1 &&  dataSnapshot.hasChild("offers")
+                            && dataSnapshot.child("offers").hasChild(user.getUid())) {
+                    ClassModel cm = dataSnapshot.child("info").getValue(ClassModel.class);
                     contents.add(cm);
-                    myClassRecyclerViewAdapter.notifyItemInserted(contents.size()-1);
-                } else if (sessionType == 1 && type.equals("H")) {
-                    ClassModel cm = dataSnapshot.getValue(ClassModel.class);
-                    contents.add(cm);
-                    myClassRecyclerViewAdapter.notifyItemInserted(contents.size()-1);
+                    cm.setOffer(cm.getCost());
+                    myOfferRecyclerViewAdapter.notifyItemInserted(contents.size()-1);
                 }
 //                LatLng latLng = new LatLng((Double)dataSnapshot.child("lat").getValue(), (Double)dataSnapshot.child("lng").getValue());
 //                mMap.addMarker(new MarkerOptions().position(latLng).title("New Marker"));
@@ -119,16 +127,59 @@ public class ClassFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_class_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_listing_list, container, false);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            myClassRecyclerViewAdapter = new MyClassRecyclerViewAdapter(contents, mListener);
-            recyclerView.setAdapter(myClassRecyclerViewAdapter);
+            myOfferRecyclerViewAdapter = new MyOfferRecyclerViewAdapter(contents, mListener);
+            recyclerView.setAdapter(myOfferRecyclerViewAdapter);
             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+            if (sessionType == 1) {
+                ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT) {
+                    @Override
+                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                        int pos = viewHolder.getAdapterPosition();
+                        contents.remove(pos);
+                        myOfferRecyclerViewAdapter.notifyItemRemoved(pos);
+                        ClassModel cm = ((MyOfferRecyclerViewAdapter.ViewHolder)viewHolder).getmItem();
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        FirebaseDatabase.getInstance().getReference("tutor_list/"+cm.getKey()+"/offers/"+user.getUid()).removeValue();
+                    }
+                    @Override
+                    public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                        if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                            // Get RecyclerView item from the ViewHolder
+                            View itemView = viewHolder.itemView;
+                            c.drawColor(Color.RED);
+                            Paint p = new Paint();
+                            if (dX > 0) {
+                                /* Set your color for positive displacement */
+                                // Draw Rect with varying right side, equal to displacement dX
+                                c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX,
+                                        (float) itemView.getBottom(), p);
+                            } else {
+                                /* Set your color for negative displacement */
+
+                                // Draw Rect with varying left side, equal to the item's right side plus negative displacement dX
+                                c.drawRect((float) itemView.getRight() + dX, (float) itemView.getTop(),
+                                        (float) itemView.getRight(), (float) itemView.getBottom(), p);
+                            }
+
+                            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                        }
+                    }
+                };
+                ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+                itemTouchHelper.attachToRecyclerView((RecyclerView)view);
+            }
         }
         return view;
     }

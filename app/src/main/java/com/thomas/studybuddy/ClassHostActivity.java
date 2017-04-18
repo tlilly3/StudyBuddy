@@ -123,7 +123,7 @@ public class ClassHostActivity extends AppCompatActivity implements GoogleApiCli
                     String room = roomNumber.getText().toString();
                     String topic = description.getText().toString();
                     String cap = capacity.getText().toString();
-                    ClassModel cm = new ClassModel(course, buildingName, Double.valueOf(room), topic, Double.valueOf(1), Double.valueOf(cap));
+                    ClassModel cm = new ClassModel(course, buildingName, Long.valueOf(room), topic, 1L, Long.valueOf(cap));
                     cm.setLat(lat);
                     cm.setLng(lng);
                     if (group.getCheckedRadioButtonId() == R.id.study_radio) {
