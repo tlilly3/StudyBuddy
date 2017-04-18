@@ -9,6 +9,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -47,13 +48,45 @@ public class HomeActivity extends MainActivity implements ClassFragment.OnListFr
         setUp();
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("Studys"));
-        tabLayout.addTab(tabLayout.newTab().setText("Homeworks"));
+        tabLayout.addTab(tabLayout.newTab().setText("Study"));
+        tabLayout.addTab(tabLayout.newTab().setText("Homework"));
         ClassPager classPager =
                 new ClassPager(
                         getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(classPager);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                mViewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                tabLayout.getTabAt(position).select();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         BottomSheetUtils.setupViewPager(mViewPager);
         Button b = (Button) findViewById(R.id.test_button);
 //        final ClassModel cm = new ClassModel("CS 4001", "Howey", 101, "Assignment 12 more physics ", (double)10, (double)45);
@@ -94,6 +127,21 @@ public class HomeActivity extends MainActivity implements ClassFragment.OnListFr
         Intent classDetail = new Intent(this, ClassJoinDetail.class);
         classDetail.putExtra("class", item);
         startActivity(classDetail);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.add_session) {
+            Intent addSession = new Intent(this, ClassHostActivity.class);
+            startActivity(addSession);
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     // Since this is an object collection, use a FragmentStatePagerAdapter,
