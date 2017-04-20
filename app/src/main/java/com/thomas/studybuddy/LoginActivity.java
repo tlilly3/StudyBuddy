@@ -89,6 +89,7 @@ public class LoginActivity extends AppCompatActivity {
     private CallbackManager callbackManager;
     private Intent homeScreenIntent;
     private SignInButton googleSignIn;
+    private Button signinButton;
 
     private GoogleApiClient mGoogleApiClient;
     private final int FB_SIGN_IN = 2221;
@@ -124,7 +125,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         };
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button mEmailSignInButton = (Button) findViewById(R.id.register);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View view) {
@@ -143,6 +144,33 @@ public class LoginActivity extends AppCompatActivity {
                                     }
                                 }
                             });
+                }
+            }
+        });
+        signinButton = (Button) findViewById(R.id.sign_in);
+        signinButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (validateLogin()) {
+                    mAuth.signInWithEmailAndPassword(mEmailView.getText().toString(), mPasswordView.getText().toString())
+                            .addOnCompleteListener(LoginActivity.this , new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        // Sign in success, update UI with the signed-in user's information
+                                        Log.d(TAG, "signInWithEmail:success");
+                                        FirebaseUser user = mAuth.getCurrentUser();
+                                    } else {
+                                        // If sign in fails, display a message to the user.
+                                        Log.w(TAG, "signInWithEmail:failure", task.getException());
+
+                                        Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+
+                                }
+                            });
+
                 }
             }
         });

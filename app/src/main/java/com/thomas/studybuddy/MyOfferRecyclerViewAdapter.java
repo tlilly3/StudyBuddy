@@ -31,6 +31,7 @@ public class MyOfferRecyclerViewAdapter extends RecyclerView.Adapter<MyOfferRecy
     @Override
     public void onBindViewHolder(final MyOfferRecyclerViewAdapter.ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
+        holder.mCourseView.setText(holder.mItem.getCourse());
         holder.mLocationView.setText(holder.mItem.getLocationView());
         holder.mTopicView.setText(holder.mItem.getDescription());
         holder.mCapacityView.setText(holder.mItem.getCostView());

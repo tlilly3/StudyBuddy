@@ -127,7 +127,7 @@ public class HomeActivity extends MainActivity implements ClassFragment.OnListFr
             }
         });
         BottomSheetUtils.setupViewPager(mViewPager);
-        Button b = (Button) findViewById(R.id.test_button);
+//        Button b = (Button) findViewById(R.id.test_button);
 //        final ClassModel cm = new ClassModel("CS 4001", "Howey", 101, "Assignment 12 more physics ", (double)10, (double)45);
 //        cm.setLat(33.775179);
 //        cm.setLng(-84.396361);

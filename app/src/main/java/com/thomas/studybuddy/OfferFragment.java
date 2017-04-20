@@ -95,6 +95,12 @@ public class OfferFragment extends Fragment {
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 Log.d("Firebase", "Child was changed");
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (sessionType == 0 && dataSnapshot.child("info").child("hostUID").getValue().equals(user.getUid())
+                        && !dataSnapshot.hasChild("offers")) {
+                    contents.clear();
+                    myOfferRecyclerViewAdapter.notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -153,29 +159,7 @@ public class OfferFragment extends Fragment {
                         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                         FirebaseDatabase.getInstance().getReference("tutor_list/"+cm.getKey()+"/offers/"+user.getUid()).removeValue();
                     }
-                    @Override
-                    public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                        if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-                            // Get RecyclerView item from the ViewHolder
-                            View itemView = viewHolder.itemView;
-                            c.drawColor(Color.RED);
-                            Paint p = new Paint();
-                            if (dX > 0) {
-                                /* Set your color for positive displacement */
-                                // Draw Rect with varying right side, equal to displacement dX
-                                c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX,
-                                        (float) itemView.getBottom(), p);
-                            } else {
-                                /* Set your color for negative displacement */
 
-                                // Draw Rect with varying left side, equal to the item's right side plus negative displacement dX
-                                c.drawRect((float) itemView.getRight() + dX, (float) itemView.getTop(),
-                                        (float) itemView.getRight(), (float) itemView.getBottom(), p);
-                            }
-
-                            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-                        }
-                    }
                 };
                 ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
                 itemTouchHelper.attachToRecyclerView((RecyclerView)view);

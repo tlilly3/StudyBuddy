@@ -1,8 +1,10 @@
 package com.thomas.studybuddy;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -29,8 +31,7 @@ public class ClassJoinDetail extends AppCompatActivity {
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mDatabase = FirebaseDatabase.getInstance().getReference();
-                mDatabase.child("class").push().setValue("3");
+                Snackbar.make(findViewById(R.id.parent_layout), "Cannot join a session while hosting", Snackbar.LENGTH_LONG).show();
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

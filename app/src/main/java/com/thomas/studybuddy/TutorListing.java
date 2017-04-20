@@ -18,6 +18,10 @@ import android.widget.NumberPicker;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.thomas.studybuddy.dummy.DummyContent;
 
@@ -34,7 +38,7 @@ public class TutorListing extends MainActivity implements ClassFragment.OnListFr
         getSupportActionBar().setTitle("Tutor Requests");
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        List<ClassModel> item = new ArrayList<>();
+        final List<ClassModel> item = new ArrayList<>();
         for (int i = 0; i < 25; i++) {
             final ClassModel cm = new ClassModel("CS 4001", "Howey", 101L, "Assignment 12 more physics ", 10L, 45L);
             cm.setLat(33.775179);
@@ -46,12 +50,40 @@ public class TutorListing extends MainActivity implements ClassFragment.OnListFr
             cm.setDate("Monday, April 12, 2019");
             cm.setCost((long)(Math.random()*40));
             cm.setKey(FirebaseDatabase.getInstance().getReference().push().getKey());
-            item.add(cm);
             FirebaseDatabase.getInstance().getReference("tutor_list/"+cm.getKey()+"/info").setValue(cm);
 
         }
-        recyclerView.setAdapter(new MyListingRecyclerViewAdapter(item, this));
+        final MyListingRecyclerViewAdapter recyclerViewAdapter = new MyListingRecyclerViewAdapter(item, this);
+        recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        FirebaseDatabase.getInstance().getReference("tutor_list").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                ClassModel cm = dataSnapshot.child("info").getValue(ClassModel.class);
+                item.add(cm);
+                recyclerViewAdapter.notifyItemInserted(item.size()-1);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 

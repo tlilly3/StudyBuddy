@@ -36,6 +36,7 @@ public class MyClassRecyclerViewAdapter extends RecyclerView.Adapter<MyClassRecy
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
+        holder.mCourseView.setText(holder.mItem.getCourse());
         holder.mLocationView.setText(holder.mItem.getLocationView());
         holder.mTopicView.setText(holder.mItem.getDescription());
         holder.mCapacityView.setText(holder.mItem.getCapcityView());
