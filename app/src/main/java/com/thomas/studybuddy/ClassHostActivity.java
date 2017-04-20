@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
@@ -41,17 +42,25 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.TextHttpResponseHandler;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
+
+import cz.msebera.android.httpclient.Header;
 
 public class ClassHostActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private Button hostButton;
     private DatabaseReference mDatabase;
     private RadioGroup group;
-    private EditText building;
+    private AutoCompleteTextView building;
     private EditText roomNumber;
     private EditText description;
     private EditText capacity;
@@ -70,7 +79,7 @@ public class ClassHostActivity extends AppCompatActivity implements GoogleApiCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_class_host);
-        building = (EditText) findViewById(R.id.building);
+        building = (AutoCompleteTextView) findViewById(R.id.building);
         roomNumber = (EditText) findViewById(R.id.room_number);
         description = (EditText) findViewById(R.id.description);
         capacity = (EditText) findViewById(R.id.capacity);
@@ -81,7 +90,7 @@ public class ClassHostActivity extends AppCompatActivity implements GoogleApiCli
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Host Session");
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, Arrays.asList("CS 4001", "CS 4002", "CS 4003"));
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, Arrays.asList("CS 3210", "CS 3312", "CX 4220", "CX 4365"));
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(arrayAdapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -93,6 +102,30 @@ public class ClassHostActivity extends AppCompatActivity implements GoogleApiCli
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 course = "This should never happen";
+            }
+        });
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get("http://m.gatech.edu/api/gtplaces/buildings", new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                try {
+                    JSONArray array = new JSONArray(responseString);
+                    LinkedList<String> list = new LinkedList<>();
+                    for (int i = 0; i < array.length(); i++) {
+                        list.add(array.getJSONObject(i).getString("name"));
+                    }
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(ClassHostActivity.this, android.R.layout.simple_list_item_1, list);
+                    building.setAdapter(adapter);
+                    building.setThreshold(1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
         googleApiClient = new GoogleApiClient.Builder(this)
@@ -123,7 +156,7 @@ public class ClassHostActivity extends AppCompatActivity implements GoogleApiCli
                     String room = roomNumber.getText().toString();
                     String topic = description.getText().toString();
                     String cap = capacity.getText().toString();
-                    ClassModel cm = new ClassModel(course, buildingName, Long.valueOf(room), topic, 1L, Long.valueOf(cap));
+                    ClassModel cm = new ClassModel(course, buildingName, Long.valueOf(room), topic, 4L, Long.valueOf(cap));
                     cm.setLat(lat);
                     cm.setLng(lng);
                     if (group.getCheckedRadioButtonId() == R.id.study_radio) {
@@ -134,8 +167,10 @@ public class ClassHostActivity extends AppCompatActivity implements GoogleApiCli
                     cm.setHostUID(user.getUid());
                     // Todo add real display name
                     cm.setHost("Thomas Lilly");
+                    cm.setParticipants(new ArrayList<>(Arrays.asList("Nicolette Prevost", "Pratik Kunapali", "Hannah Lee")));
+                    cm.setCost(0L);
                     ref.child(user.getUid()).setValue(cm);
-                    Intent intent = new Intent(ClassHostActivity.this, HomeActivity.class);
+                    Intent intent = new Intent(ClassHostActivity.this, CancelSessionActivity.class);
                     PendingIntent pendingIntent = PendingIntent.getActivity(ClassHostActivity.this, 01, intent, PendingIntent.FLAG_ONE_SHOT);
                     Uri defaultSoundUri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                     Notification.Builder builder = new Notification.Builder(getApplicationContext());
@@ -150,7 +185,7 @@ public class ClassHostActivity extends AppCompatActivity implements GoogleApiCli
                     NotificationManager notificationManger =
                             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     notificationManger.notify(01, notification);
-
+                    finish();
                 }
             }
         });

@@ -69,8 +69,10 @@
         <activity
             android:name=".OffersActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".AddTutorListingAcitivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".AddTutorListingAcitivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".CancelSessionActivity"></activity>
     </application>
 
 </manifest>

@@ -7,6 +7,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by thomas on 4/15/17.
@@ -212,12 +213,15 @@ public class ClassModel implements Parcelable {
     }
 
     public String getMoneyView() {
-        long reduced = (cost / 10) + 1;
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < reduced; i++) {
-            sb.append("$");
+        if (cost != null) {
+            long reduced = (cost / 10) + 1;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < reduced; i++) {
+                sb.append("$");
+            }
+            return sb.toString();
         }
-        return sb.toString();
+        return null;
     }
     public String getCostView() {
         if (offer == null) {
@@ -244,6 +248,20 @@ public class ClassModel implements Parcelable {
 
     public void setOffer(Long offer) {
         this.offer = offer;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof ClassModel) {
+            ClassModel other = (ClassModel) o;
+            return other.course.equals(this.course) && other.description.equals(this.description);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return description.hashCode();
     }
 
 

@@ -94,7 +94,7 @@ public class TutorListing extends MainActivity implements ClassFragment.OnListFr
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.add_session) {
-            Intent addSession = new Intent(this, ClassHostActivity.class);
+            Intent addSession = new Intent(this, AddTutorListingAcitivity.class);
             startActivity(addSession);
         }
 

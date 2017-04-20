@@ -1,7 +1,11 @@
 package com.thomas.studybuddy;
 
+import android.*;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -19,6 +23,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,6 +36,7 @@ import com.thomas.studybuddy.dummy.DummyContent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import biz.laenger.android.vpbs.BottomSheetUtils;
@@ -41,12 +47,45 @@ public class HomeActivity extends MainActivity implements ClassFragment.OnListFr
     private ViewPager mViewPager;
     private MapFragment mapFragment;
     private GoogleMap mMap;
+    HashMap<LatLng, Marker> mapMarkers;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setUp();
+        mapMarkers = new HashMap<>();
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        ref.child("sessions").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                LatLng latLng = new LatLng((Double) dataSnapshot.child("lat").getValue(), (Double) dataSnapshot.child("lng").getValue());
+                Marker m = mMap.addMarker(new MarkerOptions().position(latLng).title(dataSnapshot.child("course").getValue() + " - " + dataSnapshot.child("description").getValue()));
+                mapMarkers.put(latLng, m);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                LatLng latLng = new LatLng((Double) dataSnapshot.child("lat").getValue(), (Double) dataSnapshot.child("lng").getValue());
+                mapMarkers.get(latLng).remove();
+                mapMarkers.remove(latLng);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Study"));
         tabLayout.addTab(tabLayout.newTab().setText("Homework"));
@@ -108,12 +147,27 @@ public class HomeActivity extends MainActivity implements ClassFragment.OnListFr
         mapFragment.getMapAsync(this);
 
 
-
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(HomeActivity.this,
+                    new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    1);
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setAllGesturesEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(33.774259, -84.398170);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Campanile"));

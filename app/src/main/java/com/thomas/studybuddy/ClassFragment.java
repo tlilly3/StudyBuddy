@@ -92,6 +92,11 @@ public class ClassFragment extends Fragment {
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 Log.d("Firebase", "Child was removed successfully");
+                int index = contents.indexOf(dataSnapshot.getValue(ClassModel.class));
+                if (index != -1) {
+                    contents.remove(index);
+                    myClassRecyclerViewAdapter.notifyItemRemoved(index);
+                }
             }
 
             @Override
